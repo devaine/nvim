@@ -45,6 +45,14 @@ keybind("i", "jk", "<Esc>", { desc = "Keybind set for Justin" })
 keybind("n", "<leader>mm", "<Cmd>Neotree toggle<CR>", { desc = "Toggle File Explorer" })
 keybind("n", "<leader>jj", "<Cmd>Neotree action=focus<CR>", { desc = "Focus on file explorer" })
 
+-- open floating terminal
+-- to see toggling, see dev-utils.lua for closing function
+keybind('n', '<C-Space>', '<CMD>lua require("FTerm").open()<CR>')
+
+-- remote connection
+keybind('n', '<leader>;;', '<CMD>RemoteStart<CR>')
+
+
 -- file handling
 opt.backup = false
 opt.writebackup = false

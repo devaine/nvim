@@ -8,6 +8,7 @@ return {
 			require("mason").setup()
 			require("mason-lspconfig").setup({
 				-- Ensure the install of these language servers
+				-- :MasonInstall shellcheck black shfmt
 				ensure_installed = {
 					"lua_ls",
 					"clangd",
@@ -21,10 +22,14 @@ return {
 			})
 		end,
 	},
+
 	{
 		"neovim/nvim-lspconfig",
 		lazy = false,
 		config = function()
+			--vim.diagnostic.config({ virtual_lines = true })
+			--vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+
 			local caps = vim.lsp.protocol.make_client_capabilities()
 			local capabilities = require("blink.cmp").get_lsp_capabilities(caps)
 			capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -72,4 +77,18 @@ return {
 			})
 		end,
 	},
+
+	{
+		"mfussenegger/nvim-jdtls",
+		config = function()
+			vim.lsp.config("jdtls", {
+				settings = {
+					java = {
+						-- Custom eclipse.jdt.ls options go here
+					},
+				},
+			})
+			vim.lsp.enable("jdtls")
+		end
+	}
 }

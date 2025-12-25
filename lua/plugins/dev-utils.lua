@@ -5,7 +5,7 @@ return {
 		branch = 'master',
 		lazy = false,
 		build = ":TSUpdate",
-		config = function ()
+		config = function()
 			require("nvim-treesitter.configs").setup({
 				ensure_installed = {
 					"lua",
@@ -81,4 +81,26 @@ return {
 		main = "ibl",
 		opts = {},
 	},
+
+	-- Floating terminal
+	{
+		"numToStr/FTerm.nvim",
+		config = function()
+			-- truly toggle floating terminal (auto closes floating terminal)
+			-- thank you: https://github.com/numToStr/FTerm.nvim/issues/78#issuecomment-1432326116
+			local function create_autocmd(pattern, key, term)
+				vim.api.nvim_create_autocmd("FileType", {
+					pattern = pattern,
+					callback = function(event)
+						local t = term
+						vim.keymap.set("t", key, function() t:close() end, { buffer = event.buf, silent = true })
+					end,
+				})
+			end
+
+			local fterm = require("FTerm")
+			fterm.setup({})
+			create_autocmd("FTerm", "<C-Space>", fterm)
+		end
+	}
 }
