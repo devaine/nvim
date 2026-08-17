@@ -1,37 +1,40 @@
 return {
 	-- Parser that does syntax highlighting
+	-- Make sure tree-sitter-cli is up-to-date!
 	{
 		"nvim-treesitter/nvim-treesitter",
-		branch = 'master',
 		lazy = false,
+		branch = "main",
 		build = ":TSUpdate",
 		config = function()
-			require("nvim-treesitter.configs").setup({
-				ensure_installed = {
-					"lua",
-					"cpp",
-					"java",
-					"javascript",
-					"bash",
-					"python",
-					"typescript",
-					"css",
-					"html",
-					"jsdoc",
-					"http",
-					"sql",
-					"ssh_config",
-					"json",
-					"tsx",
-					"xml",
-					"yaml",
-					"nginx",
-					"gitcommit",
-					"gitignore",
-					"cmake"
-				},
-				indent = { enable = true },
-				highlight = { enable = true }
+			require("nvim-treesitter").install({
+				"lua",
+				"cpp",
+				"java",
+				"javascript",
+				"bash",
+				"python",
+				"typescript",
+				"css",
+				"html",
+				"jsdoc",
+				"http",
+				"sql",
+				"ssh_config",
+				"json",
+				"tsx",
+				"xml",
+				"yaml",
+				"nginx",
+				"gitcommit",
+				"gitignore",
+				"cmake"
+			})
+
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function(args)
+					pcall(vim.treesitter.start, args.buf)
+				end
 			})
 		end
 	},
@@ -41,7 +44,15 @@ return {
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
 		config = true,
-		opts = {}
+		opts = function()
+			local npairs = require('nvim-autopairs')
+			npairs.setup({
+				fast_wrap = {
+					map = "<D-i>",
+					chars = { '{', '[', '(', '"', "'" },
+				}
+			})
+		end
 	},
 
 	-- Allows automatic tagging on HTML or JSON (E.g: <div>test</div> )
@@ -84,23 +95,56 @@ return {
 
 	-- Floating terminal
 	{
-		"numToStr/FTerm.nvim",
+		"akinsho/toggleterm.nvim",
+		version = "*",
 		config = function()
-			-- truly toggle floating terminal (auto closes floating terminal)
-			-- thank you: https://github.com/numToStr/FTerm.nvim/issues/78#issuecomment-1432326116
-			local function create_autocmd(pattern, key, term)
-				vim.api.nvim_create_autocmd("FileType", {
-					pattern = pattern,
-					callback = function(event)
-						local t = term
-						vim.keymap.set("t", key, function() t:close() end, { buffer = event.buf, silent = true })
-					end,
-				})
+			local Terminal = require("toggleterm.terminal").Terminal
+			local newTerm = Terminal:new({
+				direction = "float",
+				on_open = function(term)
+					vim.cmd("startinsert!")
+					vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-Space>", "<cmd>close<CR>", { noremap = true, silent = true })
+				end,
+				on_close = function()
+					vim.cmd("startinsert!")
+				end,
+			})
+
+			function _Term_toggle()
+				newTerm:toggle()
 			end
 
-			local fterm = require("FTerm")
-			fterm.setup({})
-			create_autocmd("FTerm", "<C-Space>", fterm)
+			vim.api.nvim_set_keymap("n", "<C-Space>", "<cmd>lua _Term_toggle()<CR>", { noremap = true, silent = true })
 		end
+	},
+
+	-- Helps with finding environmental variables
+	{
+		"philosofonusus/ecolog.nvim",
+		branch = "v1",
+		lazy = false,
+		keys = {
+			{ '<leader>ge', '<cmd>EcologGoto<cr>',   desc = 'Go to env file' },
+			{ '<leader>ep', '<cmd>EcologPeek<cr>',   desc = 'Ecolog peek variable' },
+			{ '<leader>es', '<cmd>EcologSelect<cr>', desc = 'Switch env file' },
+		},
+		opts = {
+			integrations = {
+				blink_cmp = true
+			}
+		}
+	},
+
+
+	-- For Python mainly
+	-- Allows
+	{
+		"linux-cultist/venv-selector.nvim",
+		ft = "python",
+		opts = {
+			options = {},
+			search = {}
+		},
 	}
+
 }

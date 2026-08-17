@@ -10,9 +10,8 @@ return {
 	opts = {
 		window = {
 			mappings = {
-				["P"] = "toggle_preview",
+				["p"] = "toggle_preview",
 			}
 		}
 	},
 }
-

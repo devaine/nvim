@@ -5,9 +5,6 @@ return {
 	event = { "BufWritePre" },
 	cmd = { "ConformInfo" },
 
-	-- This will provide type hinting with LuaLS
-	---@module "conform"
-	---@type conform.setupOpts
 	opts = {
 		formatters_by_ft = {
 			lua = { "stylua" },
@@ -17,19 +14,13 @@ return {
 			sh = { "shfmt", "shellcheck" },
 			bash = { "shfmt", "shellcheck" },
 		},
-		formatters = {
-			prettier = {
-				prepend_args = function()
-					return { "" }
-				end,
-			},
-		},
 		default_format_opts = {
 			lsp_format = "fallback",
 		},
 		format_on_save = {
 			timeout_ms = 500,
-		},
+			lsp_format = "fallback"
+		}
 	},
 
 	init = function()

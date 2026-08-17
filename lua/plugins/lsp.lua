@@ -52,6 +52,33 @@ return {
 				init_options = { preferences = { disableSuggestions = false } },
 			})
 
+			vim.lsp.config("pylsp", {
+				settings = {
+					pylsp = {
+						plugins = {
+							pycodestyle = {
+								ignore = { "E501", "W503", "E265" },
+							},
+						},
+					},
+				},
+			})
+
+			local base_on_attach = vim.lsp.config.eslint.on_attach
+			vim.lsp.config("pylsp", {
+				on_attach = function(client, bufnr)
+					if not base_on_attach then
+						return
+					end
+
+					base_on_attach(client, bufnr)
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						buffer = bufnr,
+						command = "LspEslintFixAll",
+					})
+				end,
+			})
+
 			vim.lsp.enable({
 				"lua_ls",
 				"clangd",
@@ -61,19 +88,8 @@ return {
 				"html",
 				"tailwindcss",
 				"pylsp",
-			})
-		end,
-	},
-
-	{
-		"esmuellert/nvim-eslint",
-		config = function()
-			require("nvim-eslint").setup({
-				settings = {
-					workingDirectory = function(bufnr)
-						return { directory = vim.fs.root(bufnr, { "package.json" }) }
-					end,
-				},
+				"eslint-lsp",
+				"pyright",
 			})
 		end,
 	},
@@ -89,6 +105,6 @@ return {
 				},
 			})
 			vim.lsp.enable("jdtls")
-		end
-	}
+		end,
+	},
 }

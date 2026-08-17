@@ -2,13 +2,9 @@ return {
 	{
 		"saghen/blink.cmp",
 		dependencies = {
-			{ "rafamadriz/friendly-snippets" },
+			{ "disrupted/blink-cmp-conventional-commits" }
 		},
 		version = "1.*",
-
-		---@module 'blink.cmp'
-		---@type blink.cmp.Config
-
 		opts = {
 			keymap = {
 				preset = "none",
@@ -34,12 +30,12 @@ return {
 				},
 				["<S-Tab>"] = { "select_prev", "fallback" },
 				["<CR>"] = { "select_and_accept", "fallback" },
-				["<C-e>"] = { "hide", "fallback" },
+				["<C-e>"] = { "show", "hide", "fallback" },
 			},
 
 			completion = {
 				trigger = {
-					show_on_x_blocked_trigger_characters = { "." },
+					show_on_x_blocked_trigger_characters = { ".", "[", "]", "(", ")", "/", '"' },
 				},
 				documentation = {
 					auto_show = true,
@@ -50,8 +46,25 @@ return {
 			},
 
 			sources = {
-				default = { "lsp", "path", "snippets", "buffer" },
+				default = { "lsp", "path", "ecolog", "conventional_commits" },
 				min_keyword_length = 0,
+
+				providers = {
+					ecolog = {
+						name = "ecolog",
+						module = "ecolog.integrations.cmp.blink_cmp"
+					},
+
+					conventional_commits = {
+						name = 'Conventional Commits',
+						module = 'blink-cmp-conventional-commits',
+						enabled = function()
+							return vim.bo.filetype == 'gitcommit'
+						end,
+						opts = {
+						},
+					}
+				}
 			},
 
 			signature = { enabled = true },
